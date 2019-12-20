@@ -33,37 +33,31 @@ class Movie extends Component {
       this.fetchItems(endpoint);
     }
   }
-  fetchItems = endpoint => {
-    fetch(endpoint)
-      .then(result => result.json())
-      .then(result => {
-        if (result.status_code) {
-          console.log(result)
-          this.setState({ loading: false });
-        } else {
-          this.setState({ movie: result }, () => {
-            const endpoint = `${API_URL}movie/${this.props.match.params.movieId}/credits?api_key=${API_KEY}`;
-            fetch(endpoint)
-              .then(response => response.json())
-              .then(data => {
-                console.log(data)
-                const directors = data.crew.filter(member => member.job === "Director");
-                this.setState({
-                  loading: false,
-                  actors: data.cast,
-                  directors,
-                });
-              })
-            localStorage.setItem(
-              `${this.props.match.params.movieId}`,
-              JSON.stringify(this.state)
-              );
-            });
-          }
-        })
-        .catch(function(error) {
-          console.log("ERRROR:" + error.message);
+
+  fetchItems = async endpoint => {
+    const { movieId } = this.props.match.params;
+    try {
+      const result = await (await fetch(endpoint)).json();
+      if (result.status_code) {
+        console.log(result);
+        this.setState({ loading: false });
+      } else {
+        this.setState({ movie: result });
+        const creditsEndpoints = `${API_URL}movie/${movieId}/credits?api_key=${API_KEY}`;
+        const creditsresult = await (await fetch(creditsEndpoints)).json();
+        const directors = creditsresult.crew.filter(
+          member => member.job === "Director"
+        );
+        this.setState({
+          loading: false,
+          actors: creditsresult.cast,
+          directors
         });
+        localStorage.setItem(`${movieId}`, JSON.stringify(this.state));
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
   render() {

@@ -13,6 +13,7 @@ import MovieThumb from "../elements/MovieThumb/MovieThumb";
 import LoadMoreButton from "../elements/LoadMoreBtn/LoadMoreBtn";
 import Spinner from "../elements/Spinner/Spinner";
 import "./Home.css";
+import { wait } from "@testing-library/react";
 
 class Home extends Component {
   state = {
@@ -71,39 +72,41 @@ class Home extends Component {
     this.fetchItems(endpoint);
   };
 
-  fetchItems = endpoint => {
-    console.log(endpoint);
-    fetch(endpoint)
-      .then(result => result.json())
-      .catch(function(e) {
-        console.log(e); // "oh, no!"
-      })
-      .then(result => {
-        console.log(result.results);
-        console.log(this.state.movies);
-        let movies = [...this.state.movies, ...result.results];
-        this.setState(
-          {
-            movies,
-            heroImage:
-              this.state.heroImage ||
-              result.results[Math.floor(Math.random() * result.results.length)],
-            loading: false,
-            currentPage: result.page,
-            totalPages: result.total_pages
-          },
-          () => {
-            if(this.state.searchTerm === ''){
-              localStorage.setItem("HomeState", JSON.stringify(this.state));
-            }
+  fetchItems = async endpoint => {
+    const { movies, heroImage, searchTerm } = this.state;
+    const result = await(await fetch(endpoint)).json();
+    try {
+      this.setState(
+        {
+          movies: [...movies, ...result.results],
+          heroImage:
+            heroImage ||
+            result.results[Math.floor(Math.random() * result.results.length)],
+          loading: false,
+          currentPage: result.page,
+          totalPages: result.total_pages
+        },
+        () => {
+          if (searchTerm === "") {
+            localStorage.setItem("HomeState", JSON.stringify(this.state));
           }
-        );
-      });
+        }
+      ); 
+    } catch (error) {
+      console.log('ERROR',error)
+    }
   };
 
   render() {
     //ES6 destructuring the state
-    const {movies,heroImage,loading,currentPage,totalPages,searchTerm}=this.state;
+    const {
+      movies,
+      heroImage,
+      loading,
+      currentPage,
+      totalPages,
+      searchTerm
+    } = this.state;
     return (
       <div className="rmdb-home">
         {heroImage ? (
@@ -138,8 +141,7 @@ class Home extends Component {
             })}
           </FourColGrid>
           {loading ? <Spinner /> : null}
-          {currentPage <= totalPages &&
-          !loading ? (
+          {currentPage <= totalPages && !loading ? (
             <LoadMoreButton text="Load More" onClick={this.loadMoreItems} />
           ) : null}
         </div>
