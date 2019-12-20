@@ -1,5 +1,6 @@
 import React from "react";
 import { IMAGE_BASE_URL } from "../../../config";
+import PropTypes from "prop-types";
 import "./Actor.css";
 
 const Actor = (props) => {
@@ -20,5 +21,9 @@ const Actor = (props) => {
     </div>
   );
 };
+
+Actor.propTypes={
+  actor:PropTypes.array,
+}
 
 export default Actor;

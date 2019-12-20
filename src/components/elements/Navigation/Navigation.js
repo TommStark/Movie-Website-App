@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import "./Navigation.css";
 
 const Navigation = props => {
@@ -15,4 +16,9 @@ const Navigation = props => {
     </div>
   );
 };
+
+Navigation.propTypes={
+  movie: PropTypes.string
+}
+
 export default Navigation;

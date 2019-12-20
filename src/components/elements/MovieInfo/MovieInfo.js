@@ -2,6 +2,7 @@ import React from "react";
 import { IMAGE_BASE_URL, POSTER_SIZE, BACKDROP_SIZE } from "../../../config";
 import FontAwesome from "react-fontawesome";
 import MovieThumb from "../MovieThumb/MovieThumb";
+import PropTypes from "prop-types";
 import "./MovieInfo.css";
 
 const MovieInfo = props => {
@@ -56,4 +57,10 @@ const MovieInfo = props => {
     </div>
   );
 };
+
+MovieInfo.propTypes={
+  movie:PropTypes.object,
+  directors:PropTypes.array
+}
+
 export default MovieInfo;

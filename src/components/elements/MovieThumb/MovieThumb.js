@@ -1,24 +1,32 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import "./MovieThumb.css";
 
-const MovieThumb = props => {
+const MovieThumb = ({image, movieName, movieId,clickeable}) => {
   return (
     <div className="rmdb-moviethumb">
-      {props.clickeable ? (
+      {clickeable ? (
         <Link
           to={{
-            pathname: `/${props.movieId}`,
-            movieName: `${props.movieName}`
+            pathname: `/${movieId}`,
+            movieName: `${movieName}`
           }}
         >
-          <img src={props.image} alt="" />
+          <img src={image} alt="" />
         </Link>
       ) : (
-        <img src={props.image} alt="" />
+        <img src={image} alt="" />
       )}
     </div>
   );
 };
+
+MovieThumb.propTypes ={
+  image: PropTypes.string,
+  movieId: PropTypes.number,
+  movieName:PropTypes.string,
+  clickeable:PropTypes.bool
+}
 
 export default MovieThumb;
