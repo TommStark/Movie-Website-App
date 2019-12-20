@@ -17,7 +17,7 @@ const Actor = (props) => {
         alt="actors"
       />
       <span className="rmdb-actor-name">{props.actor.name}</span>
-      <span className="rmdb-actor-caracter">{props.actor.caracter}</span>
+      <span className="rmdb-actor-character">{props.actor.character}</span>
     </div>
   );
 };

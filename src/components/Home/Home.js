@@ -138,7 +138,7 @@ class Home extends Component {
             })}
           </FourColGrid>
           {loading ? <Spinner /> : null}
-          {currentPage <= this.state.totalPages &&
+          {currentPage <= totalPages &&
           !loading ? (
             <LoadMoreButton text="Load More" onClick={this.loadMoreItems} />
           ) : null}

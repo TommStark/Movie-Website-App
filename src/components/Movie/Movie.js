@@ -33,43 +33,37 @@ class Movie extends Component {
       this.fetchItems(endpoint);
     }
   }
-
-  // init() {
-  //   const endpoint = `${API_URL}movie/${this.props.match.params.movieId}/credits?api_key=${API_KEY}`;
-  //   fetch(endpoint)
-  //     .then(response => {
-  //       response.json();
-  //     })
-  //     .then(data => {
-  //       const directors = data.crew.filter(member => member.job === "Director");
-  //       this.setState({
-  //         actors: data.cast,
-  //         directors,
-  //         loading: false
-  //       });
-  //     });
-  // }
-
   fetchItems = endpoint => {
     fetch(endpoint)
       .then(result => result.json())
       .then(result => {
         if (result.status_code) {
+          console.log(result)
           this.setState({ loading: false });
         } else {
           this.setState({ movie: result }, () => {
+            const endpoint = `${API_URL}movie/${this.props.match.params.movieId}/credits?api_key=${API_KEY}`;
+            fetch(endpoint)
+              .then(response => response.json())
+              .then(data => {
+                console.log(data)
+                const directors = data.crew.filter(member => member.job === "Director");
+                this.setState({
+                  loading: false,
+                  actors: data.cast,
+                  directors,
+                });
+              })
             localStorage.setItem(
               `${this.props.match.params.movieId}`,
               JSON.stringify(this.state)
-            );
-          });
-          let cast = CastService.getCast(this.props.match.params.movieId);
-          console.log(cast);
-        }
-      })
-      .catch(function(error) {
-        console.log("ERRROR:" + error.message);
-      });
+              );
+            });
+          }
+        })
+        .catch(function(error) {
+          console.log("ERRROR:" + error.message);
+        });
   };
 
   render() {
@@ -79,10 +73,7 @@ class Movie extends Component {
         {movie ? (
           <div>
             <Navigation movie={movie.title} />
-            <MovieInfo
-              movie={movie}
-              directors={directors}
-            />
+            <MovieInfo movie={movie} directors={directors} />
             <MovieInfoBar
               time={movie.runtime}
               budget={movie.budget}
@@ -99,9 +90,7 @@ class Movie extends Component {
             </FourColGrid>
           </div>
         ) : null}
-        {!actors && !movie && !loading ? (
-          <h1>No Movie Found!</h1>
-        ) : null}
+        {!actors && !movie && !loading ? <h1>No Movie Found!</h1> : null}
         {loading ? <Spinner /> : null}
       </div>
     );
