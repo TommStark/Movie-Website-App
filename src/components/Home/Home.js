@@ -3,7 +3,6 @@ import {
   API_URL,
   API_KEY,
   IMAGE_BASE_URL,
-  POSTER_SIZE,
   BACKDROP_SIZE
 } from "../../config";
 import HeroImage from "../elements/HeroImage/HeroImage";
@@ -13,7 +12,6 @@ import MovieThumb from "../elements/MovieThumb/MovieThumb";
 import LoadMoreButton from "../elements/LoadMoreBtn/LoadMoreBtn";
 import Spinner from "../elements/Spinner/Spinner";
 import "./Home.css";
-import { wait } from "@testing-library/react";
 
 class Home extends Component {
   state = {
@@ -33,48 +31,43 @@ class Home extends Component {
       });
     } else {
       this.setState({ loading: true });
-      const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&languaje=en-US&page=1`;
-      this.fetchItems(endpoint);
+      this.fetchItems(this.createEndpoint("movie/popular",false, ""));
     }
   }
 
-  loadMoreItems = () => {
-    let endpoint = "";
-    this.setState({ loading: true });
-    if (this.state.searchTerm === "") {
-      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&languaje=en-US&page=${this
-        .state.currentPage + 1}`;
-    } else {
-      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&languaje=en-US&query=${
-        this.state.searchTerm
-      }&page=${this.state.currentPage + 1}`;
-    }
-    console.log(endpoint);
-    this.fetchItems(endpoint);
+  createEndpoint = (type, loadMore, searchTerm) => {
+    return `${API_URL}${type}?api_key=${API_KEY}&languaje=en-US&page=${loadMore &&
+      this.state.currentPage + 1}&query=${searchTerm}`;
   };
 
-  searchItems = searchTerm => {
-    console.log(searchTerm);
-    let endpoint = "";
-    this.setState({
-      movies: [],
-      loading: true,
-      searchTerm
-    });
-    if (searchTerm === "") {
-      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&languaje=en-US&page=${this
-        .state.currentPage + 1}`;
-      console.log("if");
-    } else {
-      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&languaje=en-US&query=${searchTerm}`;
-      console.log("else");
-    }
-    this.fetchItems(endpoint);
+  updateItems = (loadMore, searchTerm) => {
+    console.log(loadMore, searchTerm)
+    console.log(this.state)
+    this.setState(
+      {
+        movies: loadMore ? [...this.state.movies] : [],
+        loading: true,
+        searchTerm: loadMore ? this.state.searchTerm : searchTerm
+      },
+      () => {
+        console.log(this.state)
+        this.fetchItems(
+          !this.state.searchTerm
+            ? this.createEndpoint("movie/popular", loadMore, "")
+            : this.createEndpoint(
+                "search/movie",
+                loadMore,
+                this.state.searchTerm
+              )
+        );
+      }
+    );
   };
 
   fetchItems = async endpoint => {
+    console.log(endpoint)
     const { movies, heroImage, searchTerm } = this.state;
-    const result = await(await fetch(endpoint)).json();
+    const result = await (await fetch(endpoint)).json();
     try {
       this.setState(
         {
@@ -91,9 +84,9 @@ class Home extends Component {
             localStorage.setItem("HomeState", JSON.stringify(this.state));
           }
         }
-      ); 
+      );
     } catch (error) {
-      console.log('ERROR',error)
+      console.log("ERROR", error);
     }
   };
 
@@ -109,7 +102,7 @@ class Home extends Component {
     } = this.state;
     return (
       <div className="rmdb-home">
-        {heroImage ? (
+        {heroImage && !searchTerm ? (
           <div>
             <HeroImage
               image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}${heroImage.backdrop_path}`}
@@ -118,7 +111,7 @@ class Home extends Component {
             />
           </div>
         ) : null}
-        <SearchBar callback={this.searchItems} />
+        <SearchBar callback={this.updateItems} />
         <div className="rmdb-home-grid">
           <FourColGrid
             header={searchTerm ? "Search Result" : "Popular Movies"}
@@ -141,8 +134,8 @@ class Home extends Component {
             })}
           </FourColGrid>
           {loading ? <Spinner /> : null}
-          {currentPage <= totalPages && !loading ? (
-            <LoadMoreButton text="Load More" onClick={this.loadMoreItems} />
+          {currentPage < totalPages && !loading ? (
+            <LoadMoreButton text="Load More" onClick={this.updateItems} />
           ) : null}
         </div>
       </div>

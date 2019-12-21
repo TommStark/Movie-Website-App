@@ -6,7 +6,6 @@ import FourColGrid from "../elements/FourColGrid/FourColGrid";
 import Actor from "../elements/Actor/Actor";
 import Spinner from "../elements/Spinner/Spinner";
 import Navigation from "../elements/Navigation/Navigation";
-import CastService from "../services/CastService";
 import "./Movie.css";
 
 class Movie extends Component {
