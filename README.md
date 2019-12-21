@@ -1,6 +1,7 @@
 # Movie Website App
 <p> Movie Website made with react.js</p>
-<p> Powered by THE MOVIE DB<p>
+
+Powered by [The Movie DB](https://www.themoviedb.org/?language=es-ES)
   
 Go to the [Website](https://react-movie-ts.netlify.com)
 
